@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>App Cloud Azure</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 500px; margin: 40px auto; padding: 0 20px; background: #f4f6f9; }
+    .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    input { width: 70%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+    button { padding: 10px 15px; background: #0078d4; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    ul { list-style: none; padding: 0; margin-top: 20px; }
+    li { padding: 10px; border-bottom: 1px solid #eee; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Gestor de Notas (Azure Fullstack)</h2>
+    <input type="text" id="titulo" placeholder="Escribe una nota..." />
+    <button onclick="guardar()">Guardar</button>
+    <ul id="lista"></ul>
+  </div>
+
+  <script>
+    const API_URL = "https://api-backend.salmonbush-d6668339.eastus2.azurecontainerapps.io/api/notas";
+
+    async function cargar() {
+      const res = await fetch(API_URL);
+      const datos = await res.json();
+      document.getElementById("lista").innerHTML = datos.map(n => `<li>#${n.id} - ${n.titulo}</li>`).join("");
+    }
+
+    async function guardar() {
+      const input = document.getElementById("titulo");
+      if (!input.value) return;
+      await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ titulo: input.value })
+      });
+      input.value = "";
+      cargar();
+    }
+
+    cargar();
+  </script>
+</body>
+</html>
