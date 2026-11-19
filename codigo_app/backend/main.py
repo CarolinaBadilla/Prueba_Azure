@@ -1,8 +1,9 @@
 import os
+
 import psycopg2
-from psycopg2.extras import RealDictCursor
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel
 
 app = FastAPI(title="Cloud Portfolio API")

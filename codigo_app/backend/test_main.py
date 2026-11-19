@@ -1,5 +1,6 @@
 import os
 import sqlite3
+
 import pytest
 
 # 1. Establecer DATABASE_URL antes de importar main
@@ -24,8 +25,8 @@ except ImportError:
     engine = None
 
 import main
-from main import app
 from fastapi.testclient import TestClient
+from main import app
 
 DB_FILE = "./test_temp.db"
 
@@ -49,8 +50,7 @@ class SQLiteDictCursor:
         except sqlite3.OperationalError:
             if has_returning:
                 clean_sql_no_ret = clean_sql.replace("RETURNING *", "").replace("returning *", "").strip()
-                if clean_sql_no_ret.endswith(";"):
-                    clean_sql_no_ret = clean_sql_no_ret[:-1]
+                clean_sql_no_ret = clean_sql_no_ret.removesuffix(";")
                 if params:
                     self._cursor.execute(clean_sql_no_ret, params)
                 else:
