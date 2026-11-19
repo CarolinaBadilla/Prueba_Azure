@@ -11,7 +11,7 @@ resource "azurerm_resource_group" "app_rg" {
   name     = "rg-fullstack-dev-eastus2"
   location = "eastus2"
   tags = {
-     Environment = "dev"
-     ManagedBy   = "Terraform-GitOps"
-   }
+    Environment = "dev"
+    ManagedBy   = "Terraform-GitOps"
+  }
 }
