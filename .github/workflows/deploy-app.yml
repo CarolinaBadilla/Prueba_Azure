@@ -18,7 +18,43 @@ env:
   RESOURCE_GROUP: rg-fullstack-dev-eastus2
 
 jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies and Tools
+        run: |
+          pip install -r codigo_app/backend/requirements.txt pytest httpx ruff
+
+      - name: Run Ruff Linter
+        run: |
+          ruff check codigo_app/backend
+
+      - name: Lint Backend Dockerfile with Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: ./codigo_app/backend/Dockerfile
+          failure-threshold: error
+
+      - name: Lint Frontend Dockerfile with Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: ./codigo_app/frontend/Dockerfile
+          failure-threshold: error
+
+      - name: Run Pytest Unit Tests
+        run: |
+          pytest codigo_app/backend -v
+
   build-scan-deploy:
+    needs: lint-and-test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
