@@ -10,5 +10,8 @@ locals {
 resource "azurerm_resource_group" "app_rg" {
   name     = "rg-fullstack-dev-eastus2"
   location = "eastus2"
-  tags     = local.common_tags
+  tags = {
+     Environment = "dev"
+     ManagedBy   = "Terraform-GitOps"
+   }
 }

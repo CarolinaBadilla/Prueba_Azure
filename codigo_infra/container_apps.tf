@@ -91,6 +91,12 @@ resource "azurerm_container_app" "backend_app" {
     }
   }
 
+  lifecycle {
+     ignore_changes = [
+       template[0].container[0].image
+     ]
+   }
+
   depends_on = [
     azurerm_role_assignment.aca_acr_pull,
     azurerm_role_assignment.aca_kv_secrets_user
@@ -136,6 +142,12 @@ resource "azurerm_container_app" "frontend_app" {
       memory = "0.5Gi"
     }
   }
+
+  lifecycle {
+     ignore_changes = [
+       template[0].container[0].image
+     ]
+   }
 
   depends_on = [
     azurerm_role_assignment.aca_acr_pull
