@@ -99,7 +99,28 @@ jobs:
           docker push $ACR_SERVER/fullstack-backend:${{ github.sha }}
           docker push $ACR_SERVER/fullstack-frontend:${{ github.sha }}
 
-      - name: Update Azure Container Apps Revisions
+      - name: Deploy and Validate Backend (Zero-Downtime)
         run: |
-          az containerapp update --name api-backend --resource-group $RESOURCE_GROUP --image $ACR_SERVER/fullstack-backend:${{ github.sha }}
-          az containerapp update --name web-frontend --resource-group $RESOURCE_GROUP --image $ACR_SERVER/fullstack-frontend:${{ github.sha }}
+          SUFFIX="rev-${{ github.run_number }}-${{ github.run_attempt }}"
+          REV_NAME="api-backend--$SUFFIX"
+
+          az containerapp update --name api-backend --resource-group $RESOURCE_GROUP --image $ACR_SERVER/fullstack-backend:${{ github.sha }} --revision-suffix "$SUFFIX"
+
+          REV_FQDN=$(az containerapp revision show --name api-backend --resource-group $RESOURCE_GROUP --revision "$REV_NAME" --query "properties.fqdn" -o tsv)
+
+          curl --fail --retry 5 --retry-delay 5 --retry-all-errors "https://$REV_FQDN/health"
+
+          az containerapp ingress traffic set --name api-backend --resource-group $RESOURCE_GROUP --revision-weight "$REV_NAME=100"
+
+      - name: Deploy and Validate Frontend (Zero-Downtime)
+        run: |
+          SUFFIX="rev-${{ github.run_number }}-${{ github.run_attempt }}"
+          REV_NAME="web-frontend--$SUFFIX"
+
+          az containerapp update --name web-frontend --resource-group $RESOURCE_GROUP --image $ACR_SERVER/fullstack-frontend:${{ github.sha }} --revision-suffix "$SUFFIX"
+
+          FRONT_REV_FQDN=$(az containerapp revision show --name web-frontend --resource-group $RESOURCE_GROUP --revision "$REV_NAME" --query "properties.fqdn" -o tsv)
+
+          curl --fail --retry 5 --retry-delay 5 --retry-all-errors "https://$FRONT_REV_FQDN"
+
+          az containerapp ingress traffic set --name web-frontend --resource-group $RESOURCE_GROUP --revision-weight "$REV_NAME=100"

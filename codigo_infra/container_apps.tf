@@ -39,7 +39,7 @@ resource "azurerm_container_app" "backend_app" {
   name                         = "api-backend"
   container_app_environment_id = azurerm_container_app_environment.aca_env.id
   resource_group_name          = azurerm_resource_group.app_rg.name
-  revision_mode                = "Single"
+  revision_mode                = "Multiple"
   tags                         = local.common_tags
 
   identity {
@@ -107,7 +107,7 @@ resource "azurerm_container_app" "frontend_app" {
   name                         = "web-frontend"
   container_app_environment_id = azurerm_container_app_environment.aca_env.id
   resource_group_name          = azurerm_resource_group.app_rg.name
-  revision_mode                = "Single"
+  revision_mode                = "Multiple"
   tags                         = local.common_tags
 
   identity {
